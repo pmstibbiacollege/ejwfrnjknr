@@ -3,6 +3,6 @@ services:
     name: flask-app
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    startCommand: "gunicorn main:app"
     envVars:
         value: /usr/local/bin/chromedriver
