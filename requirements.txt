@@ -2,3 +2,4 @@ Flask
 selenium
 webdriver-manager
 chromedriver-binary
+gunicorn==20.2.0
