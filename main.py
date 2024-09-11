@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
 
-@app.route('/check_url', methods=['POST'])
+@app.route('/check_url', methods=['GET', 'POST'])
 def check_url():
     data = request.json
     url = data.get('url')
