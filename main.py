@@ -1,35 +1,43 @@
-import subprocess
-import os
-import shutil
+from flask import Flask, jsonify
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
-def install_chrome():
-    # Create a directory for Chrome
-    os.makedirs(os.path.expanduser('~/chrome'), exist_ok=True)
-    os.chdir(os.path.expanduser('~/chrome'))
+app = Flask(__name__)
 
-    # Download the Google Chrome package
-    subprocess.run(['wget', 'https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'])
+# Function to read the URL from url.txt file
+def get_url_from_txt(file_path='url.txt'):
+    with open(file_path, 'r') as file:
+        return file.readline().strip()
 
-    # Extract the package
-    subprocess.run(['ar', 'x', 'google-chrome-stable_current_amd64.deb'])
-    subprocess.run(['tar', 'xvf', 'data.tar.xz'])
+# Function to get the second redirect URL using Selenium
+def get_second_redirect(url):
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
-    # Move the binaries to a local bin directory
-    os.makedirs(os.path.expanduser('~/bin'), exist_ok=True)
-    shutil.move('opt/google/chrome/google-chrome', os.path.expanduser('~/bin/google-chrome'))
+    # Set up the Chrome WebDriver
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    # Add the local bin directory to your PATH
-    with open(os.path.expanduser('~/.bashrc'), 'a') as bashrc:
-        bashrc.write('export PATH=$HOME/bin:$PATH\n')
-    subprocess.run(['source', os.path.expanduser('~/.bashrc')], shell=True)
+    # Open the URL
+    driver.get(url)
 
-    # Verify the installation
-    chrome_path = os.path.expanduser('~/bin/google-chrome')
-    if not os.path.exists(chrome_path):
-        chrome_path = os.path.expanduser('~/bin/google-chrome-stable')
+    # Wait for the redirect to complete (adjust time if necessary)
+    driver.implicitly_wait(10)
 
-    result = subprocess.run([chrome_path, '--version'], capture_output=True, text=True)
-    print(result.stdout)
+    # Get the final redirected URL
+    second_redirect_url = driver.current_url
 
-if __name__ == "__main__":
-    install_chrome()
+    driver.quit()
+    return second_redirect_url
+
+# Flask route to check the URL redirection
+@app.route('/check_url', methods=['GET'])
+def check_url():
+    url = get_url_from_txt()  # Read the URL from url.txt
+    final_url = get_second_redirect(url)  # Get the final redirect URL
+    return jsonify({"redirected_url": final_url})  # Return as JSON response
+
+if __name__ == '__main__':
+    app.run(debug=True)
