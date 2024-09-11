@@ -2,10 +2,34 @@ services:
   - type: web
     name: flask-app
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn main:app"
+    buildCommand: |
+      # Install dependencies
+      pip install -r requirements.txt
+      # Optionally, verify installation paths
+      which chromedriver
+      which google-chrome
+    startCommand: "gunicorn app:app"
     envVars:
+      # Path to the ChromeDriver binary
       - key: CHROMEDRIVER_PATH
         value: /usr/local/bin/chromedriver
+      # Path to the Chrome binary
       - key: CHROME_PATH
         value: /usr/bin/google-chrome
+    # Optional: If you need to install Chrome and ChromeDriver as part of the build process
+    buildCommand: |
+      # Install dependencies
+      pip install -r requirements.txt
+      # Install Chrome
+      curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb
+      dpkg -i google-chrome.deb
+      apt-get install -f  # Install dependencies
+      # Install ChromeDriver
+      CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+      curl -sS -O https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+      unzip chromedriver_linux64.zip
+      mv chromedriver /usr/local/bin/chromedriver
+      chmod +x /usr/local/bin/chromedriver
+      # Verify installation paths
+      which chromedriver
+      which google-chrome
