@@ -17,6 +17,9 @@ def get_second_redirect(url):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
+    # Specify the path to the Chrome binary
+    options.binary_location = "/usr/bin/google-chrome"
+
     # Set up the Chrome WebDriver
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -31,6 +34,7 @@ def get_second_redirect(url):
 
     driver.quit()
     return second_redirect_url
+
 
 # Flask route to check the URL redirection
 @app.route('/check_url', methods=['GET'])
