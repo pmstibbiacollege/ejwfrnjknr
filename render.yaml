@@ -5,4 +5,5 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn main:app"
     envVars:
+      - key: CHROMEDRIVER_PATH
         value: /usr/local/bin/chromedriver
