@@ -1,5 +1,4 @@
 Flask
 selenium
-webdriver-manager
-chromedriver-binary
+chromedriver-binary-auto
 gunicorn
