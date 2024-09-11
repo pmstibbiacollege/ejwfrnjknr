@@ -40,4 +40,4 @@ def check_url():
     return jsonify({"redirected_url": final_url})  # Return as JSON response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
