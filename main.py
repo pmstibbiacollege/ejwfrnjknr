@@ -1,32 +1,50 @@
 from flask import Flask, request, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import os
 
 app = Flask(__name__)
 
-@app.route('/check_url', methods=['GET', 'POST'])
-def check_url():
-    data = request.json
-    url = data.get('url')
+# Configure Selenium WebDriver (this example uses Chrome)
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Run headless Chrome
+chrome_service = Service(executable_path=os.environ.get('CHROMEDRIVER_PATH'))
 
-    if not url:
-        return jsonify({"error": "URL is required"}), 400
-
+def get_second_redirect_url(initial_url):
+    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
+    driver.get(initial_url)
+    
     try:
-        # Set up Selenium with Chrome WebDriver
-        options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-        # Navigate to the URL
-        driver.get(url)
-
-        # Get the final URL after JavaScript execution
-        final_url = driver.current_url
+        # Wait for JavaScript to modify the page
+        WebDriverWait(driver, 10).until(
+            EC.url_changes(initial_url)  # Wait for the URL to change
+        )
+        # Check the new URL (the second redirect)
+        second_redirect_url = driver.current_url
+    finally:
         driver.quit()
 
-        return jsonify({"initial_url": url, "final_url": final_url})
+    return second_redirect_url
+
+@app.route('/check_url', methods=['GET', 'POST'])
+def check_redirect():
+    if request.is_json:
+        data = request.get_json()
+        initial_url = data.get('url')
+    elif request.form:
+        initial_url = request.form.get('url')
+    else:
+        return jsonify({"error": "Unsupported Media Type"}), 415
+
+    if not initial_url:
+        return jsonify({"error": "No URL provided"}), 400
+
+    try:
+        second_redirect_url = get_second_redirect_url(initial_url)
+        return jsonify({"second_redirect_url": second_redirect_url})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
