@@ -8,13 +8,21 @@ import os
 
 app = Flask(__name__)
 
+# Retrieve and print environment variables
+chrome_path = os.environ.get('CHROME_PATH')
+print("Chrome Path:", chrome_path)
+
 # Configure Selenium WebDriver
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run headless Chrome
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")  # Optional
-chrome_options.binary_location = os.environ.get('CHROME_PATH')  # Ensure correct path
+
+if chrome_path:
+    chrome_options.binary_location = chrome_path
+else:
+    raise ValueError("CHROME_PATH environment variable is not set or is empty")
 
 chrome_service = Service(executable_path=os.environ.get('CHROMEDRIVER_PATH'))
 
