@@ -10,41 +10,38 @@ def fetch_redirect_url(url):
     browserstack_username = os.getenv('BROWSERSTACK_USERNAME')
     browserstack_access_key = os.getenv('BROWSERSTACK_ACCESS_KEY')
 
-    # BrowserStack configuration
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+    if not browserstack_username or not browserstack_access_key:
+        raise ValueError("BrowserStack credentials are missing")
 
-    capabilities = {
+    # BrowserStack configuration
+    options = {
         'browserName': 'Chrome',
         'browserVersion': 'latest',
         'os': 'Windows',
         'osVersion': '10',
         'name': 'Fetch Redirect URL Test'
     }
+    
+    # Convert the dictionary to a Capabilities object
+    capabilities = webdriver.DesiredCapabilities.CHROME.copy()
+    capabilities.update(options)
+
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
 
     driver = webdriver.Remote(
-        command_executor='https://{}:{}@hub.browserstack.com/wd/hub'.format(browserstack_username, browserstack_access_key),
-        options=options
+        command_executor=f'https://{browserstack_username}:{browserstack_access_key}@hub.browserstack.com/wd/hub',
+        options=options,
+        desired_capabilities=capabilities
     )
-    
-    # Apply capabilities via options if necessary
-    driver.execute_cdp_cmd('Network.enable', {})
-    driver.execute_cdp_cmd('Network.setCacheDisabled', {'cacheDisabled': True})
-    
+
     try:
         driver.get(url)
         
         # Wait for JavaScript redirection and get the final URL
         WebDriverWait(driver, 30).until(
-            EC.url_changes(url)
-        )
-        final_url = driver.current_url
-    finally:
-        driver.quit()
-
-    return final_url        WebDriverWait(driver, 30).until(
             EC.url_changes(url)
         )
         final_url = driver.current_url
