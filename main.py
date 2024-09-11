@@ -47,7 +47,11 @@ def check_url():
 @app.route('/check_chrome', methods=['GET'])
 def check_chrome():
     chrome_binary = "/usr/bin/google-chrome"
-    return jsonify({"chrome_installed": os.path.exists(chrome_binary)})
+    files_in_usr_bin = os.listdir("/usr/bin/")
+    return jsonify({
+        "chrome_installed": os.path.exists(chrome_binary),
+        "files_in_usr_bin": files_in_usr_bin
+    })
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))  # Default to port 5000 if PORT isn't set
