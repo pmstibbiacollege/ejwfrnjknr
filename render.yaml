@@ -7,3 +7,5 @@ services:
     envVars:
       - key: CHROMEDRIVER_PATH
         value: /usr/local/bin/chromedriver
+      - key: CHROME_PATH
+        value: /usr/bin/google-chrome
