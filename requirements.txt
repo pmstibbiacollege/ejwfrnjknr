@@ -1,1 +1,4 @@
-
+Flask
+selenium
+webdriver-manager
+gunicorn
