@@ -1,21 +1,21 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import os
 
 def fetch_redirect_url(url):
-    browserstack_username = os.getenv('zrh_8ZqMwbDvWoy')
-    browserstack_access_key = os.getenv('sbRQbrC7CqQfVoPzFK7c')
+    browserstack_username = os.getenv('BROWSERSTACK_USERNAME')
+    browserstack_access_key = os.getenv('BROWSERSTACK_ACCESS_KEY')
 
     # BrowserStack configuration
     capabilities = {
-        'browser': 'Chrome',
-        'browser_version': 'latest',
+        'browserName': 'Chrome',
+        'browserVersion': 'latest',
         'os': 'Windows',
-        'os_version': '10',
+        'osVersion': '10',
         'name': 'Fetch Redirect URL Test'
     }
     
