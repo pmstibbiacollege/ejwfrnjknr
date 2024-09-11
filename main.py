@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+import os
 
 app = Flask(__name__)
 
@@ -35,7 +36,6 @@ def get_second_redirect(url):
     driver.quit()
     return second_redirect_url
 
-
 # Flask route to check the URL redirection
 @app.route('/check_url', methods=['GET'])
 def check_url():
@@ -43,5 +43,12 @@ def check_url():
     final_url = get_second_redirect(url)  # Get the final redirect URL
     return jsonify({"redirected_url": final_url})  # Return as JSON response
 
+# Route to check if Chrome is installed (for debugging)
+@app.route('/check_chrome', methods=['GET'])
+def check_chrome():
+    chrome_binary = "/usr/bin/google-chrome"
+    return jsonify({"chrome_installed": os.path.exists(chrome_binary)})
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    port = int(os.environ.get('PORT', 5000))  # Default to port 5000 if PORT isn't set
+    app.run(host='0.0.0.0', port=port, debug=True)
