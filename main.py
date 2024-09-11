@@ -8,9 +8,9 @@ import os
 
 app = Flask(__name__)
 
-# Retrieve and print environment variables
-chrome_path = os.environ.get('CHROME_PATH')
-print("Chrome Path:", chrome_path)
+# Retrieve environment variables for paths
+chrome_path = os.environ.get('CHROME_PATH', '/usr/bin/google-chrome')
+chromedriver_path = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
 
 # Configure Selenium WebDriver
 chrome_options = Options()
@@ -18,13 +18,9 @@ chrome_options.add_argument("--headless")  # Run headless Chrome
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")  # Optional
+chrome_options.binary_location = chrome_path
 
-if chrome_path:
-    chrome_options.binary_location = chrome_path
-else:
-    raise ValueError("CHROME_PATH environment variable is not set or is empty")
-
-chrome_service = Service(executable_path=os.environ.get('CHROMEDRIVER_PATH'))
+chrome_service = Service(executable_path=chromedriver_path)
 
 def get_second_redirect_url(initial_url):
     driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
