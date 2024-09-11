@@ -27,7 +27,7 @@ def fetch_redirect_url(url):
     driver = webdriver.Remote(
         command_executor='https://{}:{}@hub.browserstack.com/wd/hub'.format(browserstack_username, browserstack_access_key),
         options=options,
-        desired_capabilities=capabilities
+        capabilities=capabilities  # Updated to capabilities
     )
 
     try:
