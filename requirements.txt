@@ -1,4 +1,1 @@
-Flask
-selenium
-chromedriver-binary-auto
-gunicorn
+
