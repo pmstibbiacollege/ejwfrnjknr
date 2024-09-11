@@ -26,7 +26,7 @@ def get_second_redirect_url(initial_url):
 
     return second_redirect_url
 
-@app.route('/check_redirect', methods=['POST'])
+@app.route('/check_redirect', methods=['GET', 'POST'])
 def check_redirect():
     if request.is_json:
         data = request.get_json()
