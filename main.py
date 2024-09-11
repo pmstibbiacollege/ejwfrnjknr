@@ -8,7 +8,6 @@ import os
 
 app = Flask(__name__)
 
-# Configure Selenium WebDriver (this example uses Chrome)
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run headless Chrome
 chrome_service = Service(executable_path=os.environ.get('CHROMEDRIVER_PATH'))
@@ -18,18 +17,16 @@ def get_second_redirect_url(initial_url):
     driver.get(initial_url)
     
     try:
-        # Wait for JavaScript to modify the page
         WebDriverWait(driver, 10).until(
             EC.url_changes(initial_url)  # Wait for the URL to change
         )
-        # Check the new URL (the second redirect)
         second_redirect_url = driver.current_url
     finally:
         driver.quit()
 
     return second_redirect_url
 
-@app.route('/check_url', methods=['GET', 'POST'])
+@app.route('/check_redirect', methods=['POST'])
 def check_redirect():
     if request.is_json:
         data = request.get_json()
