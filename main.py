@@ -2,13 +2,13 @@ import subprocess
 
 def install_chrome():
     # Download the Google Chrome package
-    subprocess.run(['wget', 'https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'])
+    subprocess.run(['wget', 'https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb'], check=True)
 
     # Install the package
-    subprocess.run(['dpkg', '-i', 'google-chrome-stable_current_amd64.deb'])
+    subprocess.run(['su', '-', '-c', 'dpkg -i google-chrome-stable_current_amd64.deb'], check=True)
 
     # Fix any missing dependencies
-    subprocess.run(['apt-get', 'install', '-f', '-y'])
+    subprocess.run(['su', '-', '-c', 'apt-get install -f -y'], check=True)
 
     # Verify the installation
     result = subprocess.run(['google-chrome', '--version'], capture_output=True, text=True)
