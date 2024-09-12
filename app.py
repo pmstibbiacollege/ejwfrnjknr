@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 app = Flask(__name__)
 
@@ -22,17 +21,22 @@ def check_link():
         browserstack_username = 'YOUR_BROWSERSTACK_USERNAME'
         browserstack_access_key = 'YOUR_BROWSERSTACK_ACCESS_KEY'
 
-        # Desired capabilities for BrowserStack
-        capabilities = DesiredCapabilities.CHROME.copy()
-        capabilities['os'] = 'Windows'
-        capabilities['os_version'] = '10'
-        capabilities['browser'] = 'Chrome'
-        capabilities['browser_version'] = 'latest'
-        capabilities['name'] = 'Flask App Test'
-        capabilities['browserstack.local'] = 'false'
-        capabilities['browserstack.selenium_version'] = '3.14.0'
+        # BrowserStack capabilities
+        capabilities = {
+            'bstack:options': {
+                'os': 'Windows',
+                'osVersion': '10',
+                'browserName': 'Chrome',
+                'browserVersion': 'latest',
+                'projectName': 'Flask App Test',
+                'buildName': 'Build 1',
+                'sessionName': 'Check Link',
+                'local': 'false',
+                'seleniumVersion': '3.14.0'
+            }
+        }
 
-        # Set up the Selenium WebDriver with BrowserStack
+        # Initialize the WebDriver with BrowserStack
         driver = webdriver.Remote(
             command_executor=f'https://{browserstack_username}:{browserstack_access_key}@hub-cloud.browserstack.com/wd/hub',
             options=options,
