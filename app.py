@@ -43,7 +43,7 @@ def send_email(subject, body):
     smtp_password = 'Ntbs@5163'
     
     from_email = 'CKSoftwares System <system@cksoftwares.com>'
-    to_email = 'nirmal.bhonsle@ntbs.co.in'
+    to_email = 'aplikime@akademiaelita.com'
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -60,7 +60,7 @@ def send_email(subject, body):
 def check_link():
     try:
         with open('urls.txt', 'r') as file:
-            link = file.readline().strip()
+            original_url = file.readline().strip()
 
         options = Options()
         options.add_argument('--headless')
@@ -90,7 +90,7 @@ def check_link():
             options=options
         )
 
-        driver.get(link)
+        driver.get(original_url)
         driver.implicitly_wait(30)
         second_redirect_url = driver.current_url
         driver.quit()
@@ -100,19 +100,24 @@ def check_link():
         base_url = parsed_url.netloc
         subdomain = parsed_url.hostname.split('.')[0] if len(parsed_url.hostname.split('.')) > 2 else ''
 
-        # Check if the base URL is deceptive
+        # Get the subdomain of the original URL
+        original_url_parsed = urlparse(original_url)
+        original_subdomain = original_url_parsed.hostname.split('.')[0] if len(original_url_parsed.hostname.split('.')) > 2 else ''
+
+        # Check if the second_redirect_url is deceptive
         api_key = "AIzaSyDyOPmvplb1WtijK21xb4ApvRZwCxtsA18"
         safety_status = check_url_safety(api_key, second_redirect_url)
 
         if safety_status == "Warning: The URL is flagged as deceptive.":
-            subject = f"Link tester: {subdomain}"
-            body = f"Cheers from Priest, This link is down: {base_url}"
+            subject = f"Link tester: {original_subdomain}"
+            body = f"Cheers from Priest, This link is down: {original_subdomain} pythonanywhere.com"
             send_email(subject, body)
 
         return jsonify({
             'second_redirect_url': second_redirect_url,
             'base_url': base_url,
             'subdomain': subdomain,
+            'original_subdomain': original_subdomain,
             'safety_status': safety_status
         })
     except Exception as e:
