@@ -39,7 +39,7 @@ def check_link():
         )
 
         driver.get(link)
-        driver.implicitly_wait(20)
+        driver.implicitly_wait(30)
         second_redirect_url = driver.current_url
         driver.quit()
 
