@@ -50,3 +50,7 @@ def check_link():
         return jsonify({'second_redirect_url': second_redirect_url})
     
     except Exception as e:
+        return jsonify({'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(debug=True)
