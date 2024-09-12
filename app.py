@@ -51,10 +51,21 @@ def send_email(subject, body):
     msg['Subject'] = subject
 
     msg.attach(MIMEText(body, 'plain'))
-	
-    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
-        server.login(smtp_user, smtp_password)
-        server.sendmail(from_email, to_email, msg.as_string())
+
+    try:
+        with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+            server.login(smtp_user, smtp_password)
+            server.sendmail(from_email, to_email, msg.as_string())
+        print("Email sent successfully.")
+    except smtplib.SMTPAuthenticationError:
+        print("SMTP Authentication Error: Check your username/password.")
+    except smtplib.SMTPConnectError:
+        print("SMTP Connection Error: Check your server settings.")
+    except smtplib.SMTPException as e:
+        print(f"SMTP Error: {e}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 
 @app.route('/check_link', methods=['POST'])
 def check_link():
