@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urlparse
@@ -74,6 +74,22 @@ def process_url(url):
         return url.replace('[[-User-]]', 'test').replace('[[-Domain-]]', 'test.com')
     else:
         return None
+
+@app.route('/upload_file', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    
+    if file and file.filename.endswith('.txt'):
+        with open('urls.txt', 'w') as f:
+            f.write(file.read().decode('utf-8'))
+        return jsonify({'message': 'File uploaded and contents updated successfully'}), 200
+    else:
+        return jsonify({'error': 'Invalid file type'}), 400
 
 @app.route('/check_links', methods=['POST'])
 def check_links():
@@ -154,4 +170,4 @@ def check_links():
         return jsonify({'error': str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
