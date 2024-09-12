@@ -38,9 +38,9 @@ def check_url_safety(api_key, url):
 # Function to send email
 def send_email(subject, body):
     smtp_server = 'mail.mmolokimedlabs.co.bw'
-    smtp_port = 587
+    smtp_port = 465
     smtp_user = 'accounts@mmolokimedlabs.co.bw'
-    smtp_password = 'your-email-password'
+    smtp_password = 'Accountant1986'
     
     from_email = 'CKSoftwares System <system@cksoftwares.com>'
     to_email = 'zrh.vendorebilling@gmail.com'
@@ -52,8 +52,7 @@ def send_email(subject, body):
 
     msg.attach(MIMEText(body, 'plain'))
 	
-	context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("mail.mmolokimedlabs.co.bw", 465, context=context) as server:
+    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
         server.login(smtp_user, smtp_password)
         server.sendmail(from_email, to_email, msg.as_string())
 
