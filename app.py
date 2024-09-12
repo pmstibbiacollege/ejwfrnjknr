@@ -37,10 +37,10 @@ def check_url_safety(api_key, url):
 
 # Function to send email
 def send_email(subject, body):
-    smtp_server = 'mail.mmolokimedlabs.co.bw'
+    smtp_server = 'mail.ntbs.co.in'
     smtp_port = 465
-    smtp_user = 'accounts@mmolokimedlabs.co.bw'
-    smtp_password = 'Accountant1986'
+    smtp_user = 'nirmal.bhonsle@ntbs.co.in'
+    smtp_password = 'Ntbs@5163'
     
     from_email = 'CKSoftwares System <system@cksoftwares.com>'
     to_email = 'zrh.vendorebilling@gmail.com'
