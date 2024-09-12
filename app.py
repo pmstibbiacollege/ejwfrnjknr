@@ -43,7 +43,7 @@ def send_email(subject, body):
     smtp_password = 'Ntbs@5163'
     
     from_email = 'CKSoftwares System <system@cksoftwares.com>'
-    to_email = 'aplikime@akademiaelita.com'
+    to_email = 'zrh.vendorebilling@gmail.com'
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -52,7 +52,8 @@ def send_email(subject, body):
 
     msg.attach(MIMEText(body, 'plain'))
 	
-    with smtplib.SMTP_SSL(smtp_server, smtp_port) as server:
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.btchosting.co.bw", 465, context=context) as server:
         server.login(smtp_user, smtp_password)
         server.sendmail(from_email, to_email, msg.as_string())
 
