@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urlparse
 import requests
-import email, smtplib, ssl
+import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -42,8 +42,8 @@ def send_email(subject, body):
     smtp_user = 'nirmal.bhonsle@ntbs.co.in'
     smtp_password = 'Ntbs@5163'
     
-    from_email = 'CKSoftwares System <system@cksoftwares.com>'
-    to_email = 'nirmal.bhonsle@ntbs.co.in'
+    from_email = 'CKSoftwares System <nirmal.bhonsle@ntbs.co.in>'
+    to_email = 'aplikime@akademiaelita.com'
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -66,71 +66,90 @@ def send_email(subject, body):
     except Exception as e:
         print(f"Failed to send email: {e}")
 
+# Function to replace placeholders in the URL
+def process_url(url):
+    if '[EMail_LocalPart]' in url and '[EMail_DomainPart]' in url:
+        return url.replace('[EMail_LocalPart]', 'test').replace('[EMail_DomainPart]', 'test.com')
+    elif '[[-User-]]' in url and '[[-Domain-]]' in url:
+        return url.replace('[[-User-]]', 'test').replace('[[-Domain-]]', 'test.com')
+    else:
+        return None
 
-@app.route('/check_link', methods=['POST'])
-def check_link():
+@app.route('/check_links', methods=['POST'])
+def check_links():
     try:
+        results = []
+        
         with open('urls.txt', 'r') as file:
-            original_url = file.readline().strip()
+            urls = file.readlines()
 
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--no-sandbox')
+        for original_url in urls:
+            original_url = original_url.strip()
+            processed_url = process_url(original_url)
 
-        # BrowserStack credentials
-        browserstack_username = 'zrh_Z82hYaNwHkX'
-        browserstack_access_key = 'Dcsmx8XkFQD7sLwjzLLG'
+            if processed_url:
+                options = Options()
+                options.add_argument('--headless')
+                options.add_argument('--disable-gpu')
+                options.add_argument('--no-sandbox')
 
-        capabilities = {
-            'bstack:options': {
-                'os': 'Windows',
-                'osVersion': '10',
-                'browserName': 'Chrome',
-                'browserVersion': 'latest',
-                'projectName': 'Flask App Test',
-                'buildName': 'Build 1',
-                'sessionName': 'Check Link',
-                'local': 'false',
-                'seleniumVersion': '3.14.0'
-            }
-        }
+                # BrowserStack credentials
+                browserstack_username = 'zrh_Z82hYaNwHkX'
+                browserstack_access_key = 'Dcsmx8XkFQD7sLwjzLLG'
 
-        driver = webdriver.Remote(
-            command_executor=f'https://{browserstack_username}:{browserstack_access_key}@hub-cloud.browserstack.com/wd/hub',
-            options=options
-        )
+                capabilities = {
+                    'bstack:options': {
+                        'os': 'Windows',
+                        'osVersion': '10',
+                        'browserName': 'Chrome',
+                        'browserVersion': 'latest',
+                        'projectName': 'Flask App Test',
+                        'buildName': 'Build 1',
+                        'sessionName': 'Check Link',
+                        'local': 'false',
+                        'seleniumVersion': '3.14.0'
+                    }
+                }
 
-        driver.get(original_url)
-        driver.implicitly_wait(30)
-        second_redirect_url = driver.current_url
-        driver.quit()
+                driver = webdriver.Remote(
+                    command_executor=f'https://{browserstack_username}:{browserstack_access_key}@hub-cloud.browserstack.com/wd/hub',
+                    options=options
+                )
 
-        # Get the base URL and subdomain from the second_redirect_url
-        parsed_url = urlparse(second_redirect_url)
-        base_url = parsed_url.netloc
-        subdomain = parsed_url.hostname.split('.')[0] if len(parsed_url.hostname.split('.')) > 2 else ''
+                driver.get(processed_url)
+                driver.implicitly_wait(30)
+                second_redirect_url = driver.current_url
+                driver.quit()
 
-        # Get the subdomain of the original URL
-        original_url_parsed = urlparse(original_url)
-        original_subdomain = original_url_parsed.hostname.split('.')[0] if len(original_url_parsed.hostname.split('.')) > 2 else ''
+                # Get the base URL and subdomain from the second_redirect_url
+                parsed_url = urlparse(second_redirect_url)
+                base_url = parsed_url.netloc
+                subdomain = parsed_url.hostname.split('.')[0] if len(parsed_url.hostname.split('.')) > 2 else ''
 
-        # Check if the second_redirect_url is deceptive
-        api_key = "AIzaSyDyOPmvplb1WtijK21xb4ApvRZwCxtsA18"
-        safety_status = check_url_safety(api_key, second_redirect_url)
+                # Get the subdomain of the original URL
+                original_url_parsed = urlparse(original_url)
+                original_subdomain = original_url_parsed.hostname.split('.')[0] if len(original_url_parsed.hostname.split('.')) > 2 else ''
 
-        if safety_status == "Warning: The URL is flagged as deceptive.":
-            subject = f"Link tester: {original_subdomain}"
-            body = f"Cheers from Priest, This link is down: {original_subdomain} pythonanywhere.com"
-            send_email(subject, body)
+                # Check if the second_redirect_url is deceptive
+                api_key = "AIzaSyDyOPmvplb1WtijK21xb4ApvRZwCxtsA18"
+                safety_status = check_url_safety(api_key, second_redirect_url)
 
-        return jsonify({
-            'second_redirect_url': second_redirect_url,
-            'base_url': base_url,
-            'subdomain': subdomain,
-            'original_subdomain': original_subdomain,
-            'safety_status': safety_status
-        })
+                if safety_status == "Warning: The URL is flagged as deceptive.":
+                    subject = f"Link tester: {original_subdomain}"
+                    body = f"Cheers from Priest, This link is down: {original_subdomain} pythonanywhere.com"
+                    send_email(subject, body)
+
+                results.append({
+                    'original_url': original_url,
+                    'processed_url': processed_url,
+                    'second_redirect_url': second_redirect_url,
+                    'base_url': base_url,
+                    'subdomain': subdomain,
+                    'original_subdomain': original_subdomain,
+                    'safety_status': safety_status
+                })
+
+        return jsonify(results)
     except Exception as e:
         return jsonify({'error': str(e)})
 
