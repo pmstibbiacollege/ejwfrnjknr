@@ -43,7 +43,7 @@ def send_email(subject, body):
     smtp_password = 'Ntbs@5163'
     
     from_email = 'CKSoftwares System <system@cksoftwares.com>'
-    to_email = 'zrh.vendorebilling@gmail.com'
+    to_email = 'aplikime@akademiaelita.com'
 
     msg = MIMEMultipart()
     msg['From'] = from_email
