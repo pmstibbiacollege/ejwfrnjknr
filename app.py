@@ -43,7 +43,7 @@ def send_email(subject, body):
     smtp_password = 'Ntbs@5163'
     
     from_email = 'CKSoftwares System <nirmal.bhonsle@ntbs.co.in>'
-    to_email = 'aplikime@akademiaelita.com'
+    to_email = 'officialraybin@protonmail.com'
 
     msg = MIMEMultipart()
     msg['From'] = from_email
