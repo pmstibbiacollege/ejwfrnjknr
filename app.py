@@ -156,11 +156,6 @@ def check_links():
                     send_email(subject, body)
 
                 results.append({
-                    'original_url': original_url,
-                    'processed_url': processed_url,
-                    'second_redirect_url': second_redirect_url,
-                    'base_url': base_url,
-                    'subdomain': subdomain,
                     'original_subdomain': original_subdomain,
                     'safety_status': safety_status
                 })
