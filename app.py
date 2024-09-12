@@ -3,6 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urlparse
 import requests
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 app = Flask(__name__)
 
@@ -31,6 +34,28 @@ def check_url_safety(api_key, url):
         return "Warning: The URL is flagged as deceptive."
     else:
         return "The URL is safe."
+
+# Function to send email
+def send_email(subject, body):
+    smtp_server = 'mail.mmolokimedlabs.co.bw'
+    smtp_port = 587
+    smtp_user = 'accounts@mmolokimedlabs.co.bw'
+    smtp_password = 'your-email-password'
+    
+    from_email = 'CKSoftwares System <system@cksoftwares.com>'
+    to_email = 'zrh.vendorebilling@gmail.com'
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+	
+	context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("mail.mmolokimedlabs.co.bw", 465, context=context) as server:
+        server.login(smtp_user, smtp_password)
+        server.sendmail(from_email, to_email, msg.as_string())
 
 @app.route('/check_link', methods=['POST'])
 def check_link():
@@ -71,16 +96,24 @@ def check_link():
         second_redirect_url = driver.current_url
         driver.quit()
 
-        # Get the base URL from the second_redirect_url
-        base_url = urlparse(second_redirect_url).netloc
+        # Get the base URL and subdomain from the second_redirect_url
+        parsed_url = urlparse(second_redirect_url)
+        base_url = parsed_url.netloc
+        subdomain = parsed_url.hostname.split('.')[0] if len(parsed_url.hostname.split('.')) > 2 else ''
 
         # Check if the base URL is deceptive
         api_key = "AIzaSyDyOPmvplb1WtijK21xb4ApvRZwCxtsA18"
         safety_status = check_url_safety(api_key, second_redirect_url)
 
+        if safety_status == "Warning: The URL is flagged as deceptive.":
+            subject = f"Link tester: {subdomain}"
+            body = f"Cheers from Priest, This link is down: {base_url}"
+            send_email(subject, body)
+
         return jsonify({
             'second_redirect_url': second_redirect_url,
             'base_url': base_url,
+            'subdomain': subdomain,
             'safety_status': safety_status
         })
     except Exception as e:
