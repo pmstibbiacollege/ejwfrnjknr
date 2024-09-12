@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from urllib.parse import urlparse
 import requests
-import smtplib
+import email, smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -53,7 +53,7 @@ def send_email(subject, body):
     msg.attach(MIMEText(body, 'plain'))
 	
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.btchosting.co.bw", 465, context=context) as server:
+    with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
         server.login(smtp_user, smtp_password)
         server.sendmail(from_email, to_email, msg.as_string())
 
