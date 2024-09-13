@@ -119,6 +119,7 @@ def check_links():
                         'osVersion': '10',
                         'browserName': 'Chrome',
                         'browserVersion': 'latest',
+                        'sessionTimeout': '120',
                         'projectName': 'Flask App Test',
                         'buildName': 'Build 1',
                         'sessionName': 'Check Link',
