@@ -110,8 +110,8 @@ def check_links():
                 options.add_argument('--no-sandbox')
 
                 # BrowserStack credentials
-                browserstack_username = 'zrh_Z82hYaNwHkX'
-                browserstack_access_key = 'Dcsmx8XkFQD7sLwjzLLG'
+                browserstack_username = 'hitenvasoya_uXSGHj'
+                browserstack_access_key = 'JJSDpLRW35ssHmpiRnEp'
 
                 capabilities = {
                     'bstack:options': {
