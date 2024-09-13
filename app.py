@@ -133,7 +133,7 @@ def check_links():
                 )
 
                 driver.get(processed_url)
-                driver.implicitly_wait(30)
+                driver.implicitly_wait(70)
                 second_redirect_url = driver.current_url
                 driver.quit()
 
